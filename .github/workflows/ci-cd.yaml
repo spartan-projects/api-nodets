@@ -1,0 +1,62 @@
+name: "API NodeTS CI-CD"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "main"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  integration:
+    strategy:
+      fail-fast: false
+      matrix: 
+        node_verision: [15.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: "Configure Nodejs"
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: "Environment Variables"
+        run: echo "Github Repository= ${{ github.repository }}"
+      - name: "Checkout Repository"
+        uses: actions/checkout@v3
+      - name: "Install Packages"
+        run: |
+          npm install typescript -g
+          npm ci --ignore-scripts
+      - name: "Build Application"
+        run: npm run build
+      - name: "Run Linter"
+        run: npm run eslint
+      - name: Run Tests
+        run: npm test -- --coverage
+      - name: List directories
+        run: |
+          ls -la
+          ls -la dist/
+      - name: "Build Application"
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          cd dist/; zip -r dist.zip .; cd ..
+          zip -r coverage.zip coverage/; mv coverage.zip dist/
+      - name: "Store artifacts"
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v2
+        with:
+          name: distributable
+          path: |
+            dist/dist.zip
+            dist/coverage.zip
+      - name: "Create Release"
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
