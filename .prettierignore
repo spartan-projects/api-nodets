@@ -9,14 +9,15 @@
 **/.husky
 
 # Config files
-.eslintrc.js
+.eslintrc.cjs
 .prettierrc.json
-babel.config.js
-commitlint.config.js
-jest.config.js
+babel.config.cjs
+commitlint.config.cjs
+jest.config.ts
 package-lock.json
 package.json
-release.config.js
+tsconfig.json
+release.config.cjs
 *.md
 
 # Logs
