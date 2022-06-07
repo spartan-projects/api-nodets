@@ -1,11 +1,12 @@
 # Config files
 .eslintrc.cjs
 .prettierrc.json
-babel.config.js
+babel.config.cjs
 commitlint.config.cjs
 jest.config.ts
 package-lock.json
 package.json
+tsconfig.json
 release.config.cjs
 node_modules/
 *.md
